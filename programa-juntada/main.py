@@ -1,29 +1,73 @@
+import os
+
+
 def ingresoAmigos():
+    """
+    Ingresa los datos de los amigos y los almacena
+    """                    
+    vacaTotal = 0
     listaAmigos = []
 
-    nombre = input("Ingrese el nombre del amigo (* para terminar): ")
+    nombre = input("Ingrese el nombre del amigo (* para terminar): ")       # Ingresa nombre y cuanto puso
     while nombre != "*":
+        amigo = {}
         cuantoPuso = float(input("Ingrese cuanto puso: "))
-        listaAmigos.append((nombre,cuantoPuso))
+        amigo["Nombre"] = nombre
+        amigo["cuantoPuso"] = cuantoPuso
+        listaAmigos.append(amigo)
         nombre = input("Ingrese el nombre del amigo (* para terminar): ")
 
-    return listaAmigos
+    os.system("cls")
+    costoTotal = int(input("Ingrese el costo total de la juntada: "))       # Ingresa costo total
 
-def cuantoDebe(amigos):
-    pusoMenos = []
-    pusoMas = []
-    costoTotal = int(input("Ingrese el costo total de la juntada: "))
-    costoProm = costoTotal / len(amigos)
+    for amigo in listaAmigos:                                               # Suma cuanto puso cada uno
+        vacaTotal += amigo["cuantoPuso"]
+
+    if vacaTotal != costoTotal:
+        os.system("cls")
+        print("Error, los valores ingresados no son correctos. Intentelo de nuevo.\n")
+        ingresoAmigos()
+
+    costoProm = costoTotal / len(listaAmigos)                               # Calcula el costo de cada uno
+    return listaAmigos, costoProm
+
+def calculoDeudas(amigos, costoProm):
+    debePlata = []
+    leDebenPlata = []
+
     for amigo in amigos:
-        if amigo[1] < costoProm:
-            pusoMenos.append((amigo[0], costoProm - amigo[1]))
-        elif amigo[1] > costoProm:
-            pusoMas.append((amigo[0], amigo[1] - costoProm))
-        else:
-            print(f"{amigo[0]} puso justo, un capo.")
+        if amigo["cuantoPuso"] < costoProm:
+            amigo["cuantoDebe"] = costoProm - amigo["cuantoPuso"]
+            amigo.pop("cuantoPuso")
+            debePlata.append(amigo)
+
+        elif amigo["cuantoPuso"] > costoProm:
+            amigo["cuantoLeDeben"] = amigo["cuantoPuso"] - costoProm
+            amigo.pop("cuantoPuso")
+            leDebenPlata.append(amigo)
+
+    return debePlata, leDebenPlata
+            
+def pagoDeDeudas(endeudados, prestamistas):
+    print(endeudados)
+    print(prestamistas)
+    for amigo in endeudados:
+        for prestamista in prestamistas:
+            if amigo["cuantoDebe"] >= prestamista["cuantoLeDeben"]:  # Si debe 800 y le deben 400
+                print("El amigo " + str(amigo["Nombre"]), end="")
+                print(" le debe pagar a " + str(prestamista["Nombre"]) + " la cantidad de " + str(prestamista["cuantoLeDeben"]))
+                amigo["cuantoDebe"] -= prestamista["cuantoLeDeben"]
+                prestamista["cuantoLeDeben"] = 0
+                
+            
+
+                
+                
+
 
 def main():
-    amigos = ingresoAmigos()
-    cuantoDebe(amigos)
+    amigos, cP = ingresoAmigos()
+    debe, leDeben = calculoDeudas(amigos, cP)
+    pagoDeDeudas(debe, leDeben)
 
 main()
