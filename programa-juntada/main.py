@@ -1,9 +1,9 @@
 import os
-
+import sys
 
 def ingresoAmigos():
     """
-    Ingresa los datos de los amigos y los almacena
+    Ingresa los datos de los amigos y los almacena en una lista de diccionarios
     """                    
     vacaTotal = 0
     listaAmigos = []
@@ -11,25 +11,32 @@ def ingresoAmigos():
     nombre = input("Ingrese el nombre del amigo (* para terminar): ")       # Ingresa nombre y cuanto puso
     while nombre != "*":
         amigo = {}
-        cuantoPuso = float(input("Ingrese cuanto puso: "))
+        cuantoPuso = float(input(f"Ingrese cuanto puso {nombre}: "))
         amigo["Nombre"] = nombre
         amigo["cuantoPuso"] = cuantoPuso
         listaAmigos.append(amigo)
         nombre = input("Ingrese el nombre del amigo (* para terminar): ")
 
-    os.system("cls")
+    return listaAmigos
+
+def calculoCosto(listaAmigos):
+    """
+    Calcula el costo promedio de la juntada y compara el costo total con la cantidad juntada por los amigos.
+    """
+    clear()
+    vacaTotal = 0
     costoTotal = int(input("Ingrese el costo total de la juntada: "))       # Ingresa costo total
 
     for amigo in listaAmigos:                                               # Suma cuanto puso cada uno
         vacaTotal += amigo["cuantoPuso"]
 
     if vacaTotal != costoTotal:
-        os.system("cls")
-        print("Error, los valores ingresados no son correctos. Intentelo de nuevo.\n")
+        clear()
+        print("Error, los valores ingresados no son correctos. Ingrese los valores de nuevo.\n")
         ingresoAmigos()
 
     costoProm = costoTotal / len(listaAmigos)                               # Calcula el costo de cada uno
-    return listaAmigos, costoProm
+    return costoProm
 
 def calculoDeudas(amigos, costoProm):
     debePlata = []
@@ -37,37 +44,39 @@ def calculoDeudas(amigos, costoProm):
 
     for amigo in amigos:
         if amigo["cuantoPuso"] < costoProm:
-            amigo["cuantoDebe"] = costoProm - amigo["cuantoPuso"]
-            amigo.pop("cuantoPuso")
+            amigo["cuantoDebe"] = round(costoProm - amigo["cuantoPuso"], 2)
+            amigo.pop("cuantoPuso") 
             debePlata.append(amigo)
 
         elif amigo["cuantoPuso"] > costoProm:
-            amigo["cuantoLeDeben"] = amigo["cuantoPuso"] - costoProm
+            amigo["cuantoLeDeben"] = round(amigo["cuantoPuso"] - costoProm, 2)
             amigo.pop("cuantoPuso")
             leDebenPlata.append(amigo)
 
     return debePlata, leDebenPlata
             
 def pagoDeDeudas(endeudados, prestamistas):
-    print(endeudados)
-    print(prestamistas)
-    for amigo in endeudados:
+    for rata in endeudados:
         for prestamista in prestamistas:
-            if amigo["cuantoDebe"] >= prestamista["cuantoLeDeben"]:  # Si debe 800 y le deben 400
-                print("El amigo " + str(amigo["Nombre"]), end="")
-                print(" le debe pagar a " + str(prestamista["Nombre"]) + " la cantidad de " + str(prestamista["cuantoLeDeben"]))
-                amigo["cuantoDebe"] -= prestamista["cuantoLeDeben"]
+            if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]:  # Si debe 800 y le deben 400
+                print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${prestamista['cuantoLeDeben']}")
+                rata["cuantoDebe"] -= prestamista["cuantoLeDeben"]
                 prestamista["cuantoLeDeben"] = 0
+            else: # Si debe 400 y le deben 800
+                print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${rata['cuantoDebe']}")
+                prestamista["cuantoLeDeben"] -= rata["cuantoDebe"]
+                rata["cuantoDebe"] = 0
                 
-            
+def clear():
+    if sys.platform == "linux":
+        os.system("clear")
+    elif sys.platfrom == "nt":
+        clear()
 
-                
-                
 
+listaAmigos = ingresoAmigos()
+costoPromedio = calculoCosto(listaAmigos)
+debe, leDeben = calculoDeudas(listaAmigos, costoPromedio)
 
-def main():
-    amigos, cP = ingresoAmigos()
-    debe, leDeben = calculoDeudas(amigos, cP)
-    pagoDeDeudas(debe, leDeben)
+pagoDeDeudas(debe, leDeben)
 
-main()
