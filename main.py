@@ -39,6 +39,9 @@ def calculoCosto(listaAmigos):
     return costoProm
 
 def calculoDeudas(amigos, costoProm):
+    """
+    Calcula deudas y devuelve dos listas de diccionarios, una con los amigos que pusieron de menos (ratas) y una con los amigos que pusieron de más (prestamistas)
+    """
     debePlata = []
     leDebenPlata = []
 
@@ -56,13 +59,16 @@ def calculoDeudas(amigos, costoProm):
     return debePlata, leDebenPlata
             
 def pagoDeDeudas(endeudados, prestamistas):
+    """
+    Indica quien le debe a quien y cuanto
+    """
     for rata in endeudados:
         for prestamista in prestamistas:
-            if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]:  # Si debe 800 y le deben 400
+            if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]:
                 print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${prestamista['cuantoLeDeben']}")
                 rata["cuantoDebe"] -= prestamista["cuantoLeDeben"]
                 prestamista["cuantoLeDeben"] = 0
-            else: # Si debe 400 y le deben 800
+            else:
                 print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${rata['cuantoDebe']}")
                 prestamista["cuantoLeDeben"] -= rata["cuantoDebe"]
                 rata["cuantoDebe"] = 0
