@@ -79,33 +79,35 @@ def mostrarLista(listaAmigos):
     """
     Muestra la lista de amigos y cuanto puso cada uno.
     """
-    ver = True
-    while ver:
-        print("Lista de amigos: ")
-        for amigo  in listaAmigos:
-            print(f"El maquinola de {amigo['Nombre']} puso {amigo['cuantoPuso']}")
+    print("Lista de amigos: ")
+    for amigo  in listaAmigos:
+        print(f"El maquinola de {amigo['Nombre']} puso {amigo['cuantoPuso']}")
 
-        opc = input("\nDesea modificar algún monto? (S/N): ").lower()
-    
-        if opc != "s":
-            ver = False
+    opc = input("\nDesea modificar algún monto? (S/N): ").lower()
 
-        while opc == "s":
-            clear()
-            compa = input("Ingrese el amigo: ")
-            for i in listaAmigos:
-                if compa == i["Nombre"]:
-                    nuevoMonto = float(input("Ingrese el nuevo monto: "))
-                    i["cuantoPuso"] = nuevoMonto
-                    opc = "n"
-                    
-                    v = input("Desea ver la lista de nuevo? (S/N): ")
-                    if v != "s":
-                        ver == False
-            if opc == "s":
-                print("Nombre incorrecto, intente de nuevo.")
-        
-        clear()
+    if opc == "s":
+        modificarLista(listaAmigos)
+
+    clear()
+
+
+def modificarLista(listaAmigos):
+    clear()
+    compa = input("Ingrese el amigo: ")
+    for i in listaAmigos:
+        if compa == i["Nombre"]:
+            nuevoMonto = float(input("Ingrese el nuevo monto: "))
+            i["cuantoPuso"] = nuevoMonto
+            opc = "n"
+            
+            v = input("Desea ver la lista de nuevo? (S/N): ")
+            if v == "s":
+                mostrarLista(listaAmigos)
+
+    if opc == "s":
+        print("Nombre incorrecto, intente de nuevo.")
+        modificarLista(listaAmigos)
+
 
 clear()
 listaAmigos = ingresoAmigos() 
