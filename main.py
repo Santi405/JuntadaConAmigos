@@ -1,5 +1,11 @@
 import os 
 import sys 
+from colored import fg, attr, colored
+
+color_green = fg('green')
+color_reset = attr('reset')
+color_yellow = fg('yellow')
+
 global listaAmigos
 
 def ingresoAmigos(): 
@@ -12,7 +18,7 @@ def ingresoAmigos():
     nombre = input("Ingrese el nombre del amigo (enter para terminar): ")       # Ingresa nombre y cuanto puso 
     while nombre != "": 
         amigo = {} 
-        cuantoPuso = round(float(input(f"Ingrese cuanto puso {nombre}: ")), 2)
+        cuantoPuso = float(input(f"Ingrese cuanto puso {nombre}: "))
         amigo["Nombre"] = nombre 
         amigo["cuantoPuso"] = cuantoPuso 
         listaAmigos.append(amigo) 
@@ -24,20 +30,21 @@ def mostrarLista():
     Muestra la lista de amigos y cuanto puso cada uno.
     """
     clear()
-    
+
     print("Lista de amigos: ")
     for amigo  in listaAmigos:
-        print(f"El maquinola de {amigo['Nombre']} puso {amigo['cuantoPuso']}")
+        print(f"El maquinola de " + color_yellow + amigo['Nombre'] + color_reset + "\t puso " + color_green + str(amigo['cuantoPuso']) + color_reset)
 
     opc = input("\nDesea modificar algún monto? (S/N): ").lower()
 
     if opc == "s":
+        clear()
         modificarLista()
 
     clear()
 
 def modificarLista():
-    clear()
+    opc = "s"
     compa = input("Ingrese el amigo: ")
     for i in listaAmigos:
         if compa == i["Nombre"]:
@@ -50,6 +57,7 @@ def modificarLista():
                 mostrarLista()
 
     if opc == "s":
+        clear()
         print("Nombre incorrecto, intente de nuevo.")
         modificarLista()
 
@@ -76,12 +84,12 @@ def calculoDeudas(costoProm):
 
     for amigo in listaAmigos: 
         if amigo["cuantoPuso"] < costoProm: 
-            amigo["cuantoDebe"] = round((costoProm - amigo["cuantoPuso"]), 2) 
+            amigo["cuantoDebe"] = costoProm - amigo["cuantoPuso"]
             amigo.pop("cuantoPuso")  
             debePlata.append(amigo) 
 
         elif amigo["cuantoPuso"] > costoProm: 
-            amigo["cuantoLeDeben"] = round(amigo["cuantoPuso"] - costoProm, 2) 
+            amigo["cuantoLeDeben"] = amigo["cuantoPuso"] - costoProm
             amigo.pop("cuantoPuso") 
             leDebenPlata.append(amigo) 
 
@@ -95,11 +103,11 @@ def pagoDeDeudas(endeudados, prestamistas):
         for prestamista in prestamistas: 
             if rata["cuantoDebe"] != 0:
                     if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]: 
-                        print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${prestamista['cuantoLeDeben']}") 
+                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(prestamista['cuantoLeDeben'], 2)) + color_reset) 
                         rata["cuantoDebe"] -= prestamista["cuantoLeDeben"] 
                         prestamista["cuantoLeDeben"] = 0 
                     else : 
-                        print(f"El amigo {rata['Nombre']} le debe pagar a {prestamista['Nombre']} ${rata['cuantoDebe']}") 
+                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(rata['cuantoDebe'], 2))) 
                         prestamista["cuantoLeDeben"] -= rata["cuantoDebe"] 
                         rata["cuantoDebe"] = 0 
 
