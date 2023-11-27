@@ -1,6 +1,9 @@
-from colored import fg, attr, colored
+from colored import fg, bg, attr, colored
 
-color_green = fg('green')
-color_reset =attr('reset')
+# Definir códigos de colores
+color_red = fg('red')
+bg_grey = bg('grey_46')  # Puedes probar con 'white' o 'grey' según tu terminal
+color_reset = attr('reset')
 
-print("Hola reeey " + color_green + "Sapeeee" + color_reset)
+# Ejemplo de uso con el método colored() y cambio de fondo y texto
+print(color_red + "Texto rojo sobre fondo gris" + color_reset)

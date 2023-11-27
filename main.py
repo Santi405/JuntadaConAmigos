@@ -15,14 +15,14 @@ def ingresoAmigos():
     vacaTotal = 0 
     listaAmigos = [] 
   
-    nombre = input("Ingrese el nombre del amigo (enter para terminar): ")       # Ingresa nombre y cuanto puso 
+    nombre = input("Ingrese el nombre del amigo (enter para terminar): " + color_yellow)       # Ingresa nombre y cuanto puso 
     while nombre != "": 
         amigo = {} 
-        cuantoPuso = float(input(f"Ingrese cuanto puso {nombre}: "))
+        cuantoPuso = float(input(color_reset + "Ingrese cuanto puso " + color_yellow + nombre + color_reset + ": " + color_green))
         amigo["Nombre"] = nombre 
         amigo["cuantoPuso"] = cuantoPuso 
         listaAmigos.append(amigo) 
-        nombre = input("Ingrese el nombre del amigo (enter para terminar): ") 
+        nombre = input(color_reset + "Ingrese el nombre del amigo (enter para terminar): " + color_yellow) 
     return listaAmigos 
 
 def mostrarLista():
@@ -31,7 +31,7 @@ def mostrarLista():
     """
     clear()
 
-    print("Lista de amigos: ")
+    print(color_reset + "Lista de amigos: ")
     for amigo  in listaAmigos:
         print(f"El maquinola de " + color_yellow + amigo['Nombre'] + color_reset + "\t puso " + color_green + str(amigo['cuantoPuso']) + color_reset)
 
@@ -107,7 +107,7 @@ def pagoDeDeudas(endeudados, prestamistas):
                         rata["cuantoDebe"] -= prestamista["cuantoLeDeben"] 
                         prestamista["cuantoLeDeben"] = 0 
                     else : 
-                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(rata['cuantoDebe'], 2))) 
+                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(rata['cuantoDebe'], 2)) + color_reset)
                         prestamista["cuantoLeDeben"] -= rata["cuantoDebe"] 
                         rata["cuantoDebe"] = 0 
 
