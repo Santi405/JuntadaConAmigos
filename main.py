@@ -12,17 +12,21 @@ def ingresoAmigos():
     """ 
      Ingresa los datos de los amigos y los almacena en una lista de diccionarios 
     """                     
-    vacaTotal = 0 
     listaAmigos = [] 
-  
     nombre = input("Ingrese el nombre del amigo (enter para terminar): " + color_yellow)       # Ingresa nombre y cuanto puso 
-    while nombre != "": 
-        amigo = {} 
-        cuantoPuso = float(input(color_reset + "Ingrese cuanto puso " + color_yellow + nombre + color_reset + ": " + color_green))
-        amigo["Nombre"] = nombre 
-        amigo["cuantoPuso"] = cuantoPuso 
-        listaAmigos.append(amigo) 
+
+    while nombre != "":  
+        nombresExist = [amigoExist["Nombre"] for amigoExist in listaAmigos]
+
+        if nombre in nombresExist:
+            print("Ya pusiste ese, pelele.")
+        else:
+            cuantoPuso = float(input(color_reset + "Ingrese cuanto puso " + color_yellow + nombre + color_reset + ": " + color_green))
+            amigo = {"Nombre": nombre , "cuantoPuso": cuantoPuso}
+            listaAmigos.append(amigo) 
+
         nombre = input(color_reset + "Ingrese el nombre del amigo (enter para terminar): " + color_yellow) 
+
     return listaAmigos 
 
 def mostrarLista():
@@ -44,22 +48,23 @@ def mostrarLista():
     clear()
 
 def modificarLista():
-    opc = "s"
-    compa = input("Ingrese el amigo: ")
-    for i in listaAmigos:
-        if compa == i["Nombre"]:
-            nuevoMonto = float(input("Ingrese el nuevo monto: "))
-            i["cuantoPuso"] = nuevoMonto
-            opc = "n"
-            
-            v = input("Desea ver la lista de nuevo? (S/N): ")
-            if v == "s":
-                mostrarLista()
+    boolNombre = False
+    while not boolNombre:
+        compa = input("Ingrese el amigo: ")
+        for i in listaAmigos:
+            if compa == i["Nombre"]:
+                nuevoMonto = float(input("Ingrese el nuevo monto: "))
+                i["cuantoPuso"] = nuevoMonto
+                boolNombre = True
+                
+                verLista = input("Desea ver la lista de nuevo? (S/N): ").lower()
+                if verLista == "s":
+                    mostrarLista()
 
-    if opc == "s":
-        clear()
-        print("Nombre incorrecto, intente de nuevo.")
-        modificarLista()
+        if not boolNombre:
+            clear()
+            print("Nombre incorrecto, intente de nuevo.")
+            
 
 def calculoCosto(): 
     """ 
@@ -68,7 +73,6 @@ def calculoCosto():
     clear() 
     vacaTotal = 0 
 
-  
     for amigo in listaAmigos:                                               # Suma cuanto puso cada uno 
         vacaTotal += amigo["cuantoPuso"] 
 
@@ -102,14 +106,15 @@ def pagoDeDeudas(endeudados, prestamistas):
     for rata in endeudados: 
         for prestamista in prestamistas: 
             if rata["cuantoDebe"] != 0:
-                    if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]: 
-                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(prestamista['cuantoLeDeben'], 2)) + color_reset) 
-                        rata["cuantoDebe"] -= prestamista["cuantoLeDeben"] 
-                        prestamista["cuantoLeDeben"] = 0 
-                    else : 
-                        print(f"El amigo " + color_yellow + rata['Nombre'] + color_reset + "\tle debe pagar a " + prestamista['Nombre'] + color_green + "\t $" + str(round(rata['cuantoDebe'], 2)) + color_reset)
-                        prestamista["cuantoLeDeben"] -= rata["cuantoDebe"] 
-                        rata["cuantoDebe"] = 0 
+                if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]: 
+                    pago = str(round(prestamista['cuantoLeDeben'], 2))
+                    rata["cuantoDebe"] -= prestamista["cuantoLeDeben"] 
+                    prestamista["cuantoLeDeben"] = 0 
+                else : 
+                    pago = str(round(rata['cuantoDebe'], 2))
+                    prestamista["cuantoLeDeben"] -= rata["cuantoDebe"] 
+                    rata["cuantoDebe"] = 0 
+                print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}") 
 
 def clear(): 
     if sys.platform == "linux": 
