@@ -119,7 +119,7 @@ def pagoDeDeudas(endeudados, prestamistas):
 def clear(): 
     if sys.platform == "linux": 
         os.system("clear") 
-    elif sys.platfrom == "nt": 
+    elif sys.platform == "nt": 
         clear() 
 
 
