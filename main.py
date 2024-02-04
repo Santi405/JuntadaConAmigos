@@ -105,7 +105,7 @@ def pagoDeDeudas(endeudados, prestamistas):
     """ 
     for rata in endeudados: 
         for prestamista in prestamistas: 
-            if rata["cuantoDebe"] != 0:
+            if rata["cuantoDebe"] != 0 and prestamista["cuantoLeDeben"] != 0:
                 if rata["cuantoDebe"] >= prestamista["cuantoLeDeben"]: 
                     pago = str(round(prestamista['cuantoLeDeben'], 2))
                     rata["cuantoDebe"] -= prestamista["cuantoLeDeben"] 
@@ -114,7 +114,11 @@ def pagoDeDeudas(endeudados, prestamistas):
                     pago = str(round(rata['cuantoDebe'], 2))
                     prestamista["cuantoLeDeben"] -= rata["cuantoDebe"] 
                     rata["cuantoDebe"] = 0 
-                print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}") 
+                
+                if len(rata['Nombre']) >= 4:
+                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}")
+                else:
+                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \t\tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}")
 
 def clear(): 
     if sys.platform == "linux": 
