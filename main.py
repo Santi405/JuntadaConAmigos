@@ -6,7 +6,6 @@ color_green = fg('green')
 color_reset = attr('reset')
 color_yellow = fg('yellow')
 
-global listaAmigos
 
 def ingresoAmigos(): 
     """ 
@@ -27,7 +26,7 @@ def ingresoAmigos():
 
         nombre = input(color_reset + "Ingrese el nombre del amigo (enter para terminar): " + color_yellow) 
 
-    return listaAmigos 
+    return listaAmigos
 
 def mostrarLista():
     """
