@@ -29,7 +29,7 @@ def ingresoAmigos():
             print("Ya pusiste ese, pelele.")
         else:
             cuantoPuso = float(input(color_reset + "Ingrese cuanto puso " + color_yellow + nombre + color_reset + ": " + color_green))
-            amigo = Amigo(nombre, cuantoPuso)
+            amigo = Amigo(nombre, cuantoPuso, 0)
             listaAmigos.append(amigo) 
 
         nombre = input(color_reset + "Ingrese el nombre del amigo (enter para terminar): " + color_yellow) 
@@ -105,17 +105,36 @@ def calculoDeudas(costoProm):
     leDebenPlata = [] 
 
     for amigo in listaAmigos: 
-        if amigo["cuantoPuso"] < costoProm: 
-            amigo["cuantoDebe"] = costoProm - amigo["cuantoPuso"]
-            amigo.pop("cuantoPuso")  
+        if amigo.dinero < costoProm: 
+            amigo.deuda = costoProm - amigo.dinero
             debePlata.append(amigo) 
 
-        elif amigo["cuantoPuso"] > costoProm: 
-            amigo["cuantoLeDeben"] = amigo["cuantoPuso"] - costoProm
-            amigo.pop("cuantoPuso") 
+        elif amigo.dinero > costoProm: 
+            amigo.deuda = amigo.dinero - costoProm
             leDebenPlata.append(amigo) 
 
     return debePlata, leDebenPlata 
+
+def pagoDeDeudas(endeudados, prestamistas): 
+    """ 
+    Indica quien le debe a quien y cuanto 
+    """ 
+    for rata in endeudados: 
+        for prestamista in prestamistas: 
+            if rata.deuda != 0 and prestamista.deuda != 0:
+                if rata.deuda >= prestamista.deuda: 
+                    pago = str(round(prestamista.deuda, 2))
+                    rata.deuda -= prestamista.deuda
+                    prestamista.deuda = 0 
+                else : 
+                    pago = str(round(rata.deuda, 2))
+                    prestamista.deuda -= rata.deuda
+                    rata.deuda = 0 
+                
+                if len(rata.nombre) >= 4:
+                    print(f"El amigo {color_yellow} {rata.nombre} {color_reset} \tle debe pagar a {prestamista.nombre} {color_green} \t $  {pago} {color_reset}")
+                else:
+                    print(f"El amigo {color_yellow} {rata.nombre} {color_reset} \t\tle debe pagar a {prestamista.nombre} {color_green} \t $  {pago} {color_reset}")
 
 
 
@@ -124,3 +143,8 @@ listaAmigos = ingresoAmigos()
 
 
 mostrarLista()
+
+costoPromedio = calculoCosto() 
+debe, leDeben = calculoDeudas(costoPromedio) 
+
+pagoDeDeudas(debe, leDeben)
