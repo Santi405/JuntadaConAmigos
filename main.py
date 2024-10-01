@@ -106,9 +106,9 @@ def pagoDeDeudas(endeudados, prestamistas):
                     rata["cuantoDebe"] = 0 
                 
                 if len(rata['Nombre']) >= 4:
-                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}")
+                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \tle debe pagar a {prestamista['Nombre']} {color_green} $  {pago} {color_reset}")
                 else:
-                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \t\tle debe pagar a {prestamista['Nombre']} {color_green} \t $  {pago} {color_reset}")
+                    print(f"El amigo {color_yellow} {rata['Nombre']} {color_reset} \t\tle debe pagar a {prestamista['Nombre']} {color_green} $  {pago} {color_reset}")
 
 def clear():
     # Check the operating system and execute the appropriate command

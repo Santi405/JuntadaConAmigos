@@ -1,150 +1,130 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import font
 
-import os 
-import sys 
-from colored import fg, attr, colored
+# Function to add participant
+def add_participant():
+    name = entry_name.get()
+    contribution = entry_contribution.get()
+    
+    if name and contribution:
+        try:
+            contribution = float(contribution)
+            participants.append({'name': name, 'contribution': contribution})
+            listbox_participants.insert(tk.END, f"{name}: ${contribution:.2f}")
+            entry_name.delete(0, tk.END)
+            entry_contribution.delete(0, tk.END)
+        except ValueError:
+            messagebox.showerror("Invalid Input", "Please enter a valid number for the contribution.")
+    else:
+        messagebox.showerror("Input Error", "Please fill in both name and contribution fields.")
 
-color_green = fg('green')
-color_reset = attr('reset')
-color_yellow = fg('yellow')
+# Function to remove selected participant
+def remove_participant():
+    try:
+        selected_index = listbox_participants.curselection()[0]
+        listbox_participants.delete(selected_index)
+        del participants[selected_index]
+    except IndexError:
+        messagebox.showerror("Selection Error", "Please select a participant to remove.")
 
+# Function to calculate debts
+def calculate_debts():
+    total = sum(p['contribution'] for p in participants)
+    num_participants = len(participants)
+    
+    if num_participants == 0:
+        messagebox.showerror("No Participants", "Add at least one participant to calculate debts.")
+        return
 
-class Amigo():
-    def __init__(self, nombre, dinero, deuda) -> None:
-        self.nombre = nombre
-        self.dinero = dinero
-        self.deuda = deuda
+    average = total / num_participants
+    result_text = f"Total collected: ${total:.2f}\nAverage contribution: ${average:.2f}\n\n"
+    
+    debtors = []
+    creditors = []
 
-
-def ingresoAmigos(): 
-    """ 
-     Ingresa los datos de los amigos y los almacena en una lista de diccionarios 
-    """                     
-    listaAmigos = [] 
-    nombre = input("Ingrese el nombre del amigo (enter para terminar): " + color_yellow)       # Ingresa nombre y cuanto puso 
-
-    while nombre != "":  
-        nombresExist = [amigoExist.nombre for amigoExist in listaAmigos]
-
-        if nombre in nombresExist:
-            print("Ya pusiste ese, pelele.")
+    for p in participants:
+        debt = p['contribution'] - average
+        if debt < 0:
+            debtors.append({'name': p['name'], 'debt': -debt})
+        elif debt > 0:
+            creditors.append({'name': p['name'], 'credit': debt})
+    
+    # Determine who should pay whom
+    i, j = 0, 0
+    while i < len(debtors) and j < len(creditors):
+        if debtors[i]['debt'] <= creditors[j]['credit']:
+            result_text += f"{debtors[i]['name']} owes {creditors[j]['name']} ${debtors[i]['debt']:.2f}\n"
+            creditors[j]['credit'] -= debtors[i]['debt']
+            i += 1
         else:
-            cuantoPuso = float(input(color_reset + "Ingrese cuanto puso " + color_yellow + nombre + color_reset + ": " + color_green))
-            amigo = Amigo(nombre, cuantoPuso, 0)
-            listaAmigos.append(amigo) 
+            result_text += f"{debtors[i]['name']} owes {creditors[j]['name']} ${creditors[j]['credit']:.2f}\n"
+            debtors[i]['debt'] -= creditors[j]['credit']
+            j += 1
 
-        nombre = input(color_reset + "Ingrese el nombre del amigo (enter para terminar): " + color_yellow) 
+    text_result.delete(1.0, tk.END)
+    text_result.insert(tk.END, result_text)
 
-    return listaAmigos
+# Function to clear all fields
+def clear_fields():
+    entry_name.delete(0, tk.END)
+    entry_contribution.delete(0, tk.END)
+    listbox_participants.delete(0, tk.END)
+    text_result.delete(1.0, tk.END)
+    participants.clear()
 
+# Create main window
+root = tk.Tk()
+root.title("Debt Calculator")
+root.config(bg="#f5f5f5")  # Soft light gray background
 
-def mostrarLista():
-    """
-    Muestra la lista de amigos y cuanto puso cada uno.
-    """
-    clear()
+# List to store participants and their contributions
+participants = []
 
-    print(color_reset + "Lista de amigos: ")
-    for amigo in listaAmigos:
-        print(f"El maquinola de " + color_yellow + amigo.nombre + color_reset + "\t puso " + color_green + str(amigo.dinero) + color_reset)
+# Load custom font (Fredoka Medium)
+try:
+    fredoka_font = font.Font(family="Fredoka Medium", size=10)
+except:
+    messagebox.showwarning("Font Warning", "Fredoka Medium font not found, using default font.")
+    fredoka_font = None
 
-    opc = input("\nDesea modificar algún monto? (S/N): ").lower()
+# Labels and entry fields for participants
+label_name = tk.Label(root, text="Participant Name:", bg="#f5f5f5", fg="#2f4f4f", font=fredoka_font or ("Arial", 10, "bold"))
+label_name.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+entry_name = tk.Entry(root, bg="#d1e7dd", fg="black", font=fredoka_font or ("Arial", 10))
+entry_name.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
-    if opc == "s":
-        clear()
-        modificarLista()
+label_contribution = tk.Label(root, text="Contribution ($):", bg="#f5f5f5", fg="#2f4f4f", font=fredoka_font or ("Arial", 10, "bold"))
+label_contribution.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+entry_contribution = tk.Entry(root, bg="#d1e7dd", fg="black", font=fredoka_font or ("Arial", 10))
+entry_contribution.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
-    clear()
+# Listbox to display participants
+listbox_participants = tk.Listbox(root, width=40, height=10, bg="#d1e7dd", fg="black", font=fredoka_font or ("Arial", 10))
+listbox_participants.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-def modificarLista():
-    boolNombre = False #Bandera
+# Buttons for actions
+button_add = tk.Button(root, text="Add Participant", command=add_participant, bg="#008080", fg="white", font=fredoka_font or ("Arial", 10, "bold"))
+button_add.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
 
-    while not boolNombre:
-        nameSearch = input("Ingrese el amigo: ")
-        for i in listaAmigos:
-            if nameSearch == i.nombre:
-                nuevoMonto = float(input("Ingrese el nuevo monto: "))
-                i.dinero = nuevoMonto
-                boolNombre = True
-                
-                verLista = input("Desea ver la lista de nuevo? (S/N): ").lower()
-                if verLista == "s":
-                    mostrarLista()
+button_remove = tk.Button(root, text="Remove Participant", command=remove_participant, bg="#f08080", fg="white", font=fredoka_font or ("Arial", 10, "bold"))
+button_remove.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
 
-        if not boolNombre:
-            clear()
-            print("Nombre incorrecto, intente de nuevo.")
+button_calculate = tk.Button(root, text="Calculate Debts", command=calculate_debts, bg="#008080", fg="white", font=fredoka_font or ("Arial", 10, "bold"))
+button_calculate.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
 
-def clear(): 
-    if sys.platform == "linux": 
-        os.system("clear") 
-    elif sys.platform == "nt": 
-        clear()
+button_clear = tk.Button(root, text="Clear", command=clear_fields, bg="#008080", fg="white", font=fredoka_font or ("Arial", 10, "bold"))
+button_clear.grid(row=4, column=1, padx=10, pady=10, sticky="ew")
 
+# Text widget to display results
+text_result = tk.Text(root, height=10, width=40, bg="#d1e7dd", fg="black", font=fredoka_font or ("Arial", 10))
+text_result.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-def calculoCosto(): 
-    """ 
-    Calcula el costo promedio de la juntada y compara el costo total con la cantidad juntada por los amigos. 
-    """ 
-    clear() 
-    vacaTotal = 0 
+# Make the window responsive
+for i in range(2):
+    root.grid_columnconfigure(i, weight=1)
+for i in range(6):
+    root.grid_rowconfigure(i, weight=1)
 
-    # Suma cuanto puso cada uno 
-    for amigo in listaAmigos:                                               
-        vacaTotal += amigo.dinero 
-
-    # Calcula el costo de cada uno 
-    costoProm = vacaTotal / len(listaAmigos)                               
-    return costoProm 
-
-
-def calculoDeudas(costoProm): 
-    """ 
-    Calcula deudas y devuelve dos listas de diccionarios, una con los amigos que pusieron de menos (ratas) y una con los amigos que pusieron de más (prestamistas) 
-    """ 
-    debePlata = [] 
-    leDebenPlata = [] 
-
-    for amigo in listaAmigos: 
-        if amigo.dinero < costoProm: 
-            amigo.deuda = costoProm - amigo.dinero
-            debePlata.append(amigo) 
-
-        elif amigo.dinero > costoProm: 
-            amigo.deuda = amigo.dinero - costoProm
-            leDebenPlata.append(amigo) 
-
-    return debePlata, leDebenPlata 
-
-def pagoDeDeudas(endeudados, prestamistas): 
-    """ 
-    Indica quien le debe a quien y cuanto 
-    """ 
-    for rata in endeudados: 
-        for prestamista in prestamistas: 
-            if rata.deuda != 0 and prestamista.deuda != 0:
-                if rata.deuda >= prestamista.deuda: 
-                    pago = str(round(prestamista.deuda, 2))
-                    rata.deuda -= prestamista.deuda
-                    prestamista.deuda = 0 
-                else : 
-                    pago = str(round(rata.deuda, 2))
-                    prestamista.deuda -= rata.deuda
-                    rata.deuda = 0 
-                
-                if len(rata.nombre) >= 4:
-                    print(f"El amigo {color_yellow} {rata.nombre} {color_reset} \tle debe pagar a {prestamista.nombre} {color_green} \t $  {pago} {color_reset}")
-                else:
-                    print(f"El amigo {color_yellow} {rata.nombre} {color_reset} \t\tle debe pagar a {prestamista.nombre} {color_green} \t $  {pago} {color_reset}")
-
-
-
-clear()
-listaAmigos = ingresoAmigos() 
-
-
-mostrarLista()
-
-costoPromedio = calculoCosto() 
-debe, leDeben = calculoDeudas(costoPromedio) 
-
-pagoDeDeudas(debe, leDeben)
+# Run the main loop
+root.mainloop()
