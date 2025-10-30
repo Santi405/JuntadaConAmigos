@@ -63,6 +63,9 @@ def calculoCosto(lista):
     clear() 
     vacaTotal = 0 
 
+    if not lista:
+        return 0
+
     for amigo in lista:                                               # Suma cuanto puso cada uno 
         vacaTotal += amigo["cuantoPuso"] 
 
@@ -139,4 +142,5 @@ def main():
     pagoDeDeudas(debe, leDeben)
 
 
-main()
+if __name__ == "__main__":
+    main()
